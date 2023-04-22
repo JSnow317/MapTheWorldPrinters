@@ -51,7 +51,7 @@ exports.register = (req, res) => {
             });
         }
 
-        db.query(insertSQL, [i, 1, username, email, hashedPassword, 'NOW()'], (error, results) => {
+        db.query(insertSQL, [i, 1, username, email, password, 'NOW()'], (error, results) => {
             db.query(insertUserPrinterSQL, [i, 1], (error, resultss) => {
                 if(error){
                     throw(error);
