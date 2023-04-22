@@ -84,6 +84,6 @@ app.use('/auth', require('./auth'));
 
 
 
-app.listen(5002, (req, res) => {
+app.listen(3000, (req, res) => {
     console.log("Server Started");
 });
