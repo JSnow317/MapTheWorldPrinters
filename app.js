@@ -81,6 +81,6 @@ app.use('/', require('./routes/pages'));
 app.use('/', require('./auth'));
 app.use('/auth', require('./auth'));
 
-app.listen(5002, (req, res) => {
-    console.log("Server Started: Listening at Port 5002");
+app.listen(5001, (req, res) => {
+    console.log("Server Started: Listening at Port 5001");
 });

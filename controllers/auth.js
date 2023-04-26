@@ -67,7 +67,7 @@ exports.register = (req, res) => {
                             throw error;
                          }
                          localStorage.clear();
-                         localStorage.setItem("username", s); 
+                         localStorage.setItem("username", username); 
                          let globalX = localStorage.getItem("username");
                          console.log("Local Storage Username: ", globalX);
                     })
