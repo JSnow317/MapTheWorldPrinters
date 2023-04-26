@@ -67,6 +67,10 @@ router.get('/login', (req, res) => {
     res.render('login');
 });
 
+router.get('/AdminLogin', (req, res) => {
+    res.render('AdminLogin');
+})
+
 router.get('/Admin_Home', (req, res) => {
     res.render('Admin_Home');
 });

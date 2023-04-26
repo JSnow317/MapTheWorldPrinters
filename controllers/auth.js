@@ -56,10 +56,20 @@ exports.register = (req, res) => {
                 if(error){
                     throw(error);
                 } else{
-                    db.query(userPrinterSQL, [username, username], async (error, results) => {
+                    db.query(userPrinterSQL, [username, username], (error, results) => {
                         res.render('UserDashboard', {"data":results[0], "myData":results[1]});
                         console.log("Row one", results[0]);
                         console.log("Row Two", results[1]);
+                        if (typeof localStorage === "undefined" || localStorage === null) {
+                            var LocalStorage = require('node-localstorage').LocalStorage;
+                            localStorage = new LocalStorage('./scratch');
+                         } else{
+                            throw error;
+                         }
+                         localStorage.clear();
+                         localStorage.setItem("username", s); 
+                         let globalX = localStorage.getItem("username");
+                         console.log("Local Storage Username: ", globalX);
                     })
                 }
             })
@@ -74,10 +84,60 @@ exports.login = (req, res) => {
     const {username, password} = req.body;
 
     // relay users printer connections
+
+    var userPrinterSQL = "SELECT * from User WHERE Username = ?;SELECT * FROM UserPrinter JOIN User ON (User.UserID = UserPrinter.User_UserID) JOIN Printer ON (Printer.PrinterID = UserPrinter.Printer_PrinterID) WHERE Username = ?;";
+
+    db.query('SELECT Username from User WHERE Username = ?', [username], (error, results) => {
+        db.query('SELECT Passwrd from User WHERE Passwrd = ?', [password], (errorPass, resultsPass) => {
+
+            var resultUser = Object.values(JSON.parse(JSON.stringify(results)))
+            var resultPass = Object.values(JSON.parse(JSON.stringify(resultsPass)))
+            if(error){
+                console.log(error);
+            }
+            // if(resultArray.length && password.length > 0) password is correct
+            // if password correct, query all information from said user, and add it to the UserDashboard page.
+            if(resultUser.length > 0 && resultPass.length > 0){
+                db.query(userPrinterSQL, [username, username], (error, results) => {
+                    res.render('UserDashboard', {"data":results[0], "myData":results[1]});
+                    let s = username;
+                    
+                    if (typeof localStorage === "undefined" || localStorage === null) {
+                        var LocalStorage = require('node-localstorage').LocalStorage;
+                        localStorage = new LocalStorage('./scratch');
+                     } else{
+                        console.log("Login Error: ", error);
+                        console.log("Login ErrorPass: ", errorPass);
+                     }
+                     
+                     localStorage.clear();
+                     localStorage.setItem("username", s); 
+                     let globalX = localStorage.getItem("username");
+                     console.log("Local Storage Username: ", globalX);
+                    // profile page should have same username
+                    
+                })
+            } else{
+                return res.render('login', {
+                    message: 'Incorrect Email or Password'
+                });
+            }
+
+        })
+    });
+
+        
+}
+
+exports.adminLogin = (req, res) => {
+
+    const {username, password} = req.body;
+
+    // relay users printer connections
     var userPrinterSQL = "SELECT * from User WHERE Username = ?;SELECT * FROM UserPrinter JOIN User ON (User.UserID = UserPrinter.User_UserID) JOIN Printer ON (Printer.PrinterID = UserPrinter.Printer_PrinterID) WHERE Username = ?;SELECT * FROM HotelUserPrinter JOIN HotelUser ON (HotelUser.idHotelUser = HotelUserPrinter.User_HotelUserID) JOIN Printer ON (Printer.PrinterID = HotelUserPrinter.Printer_HotelPrinterID);";
 
-    db.query('SELECT Username from User WHERE Username = ?', [username], async (error, results) => {
-        db.query('SELECT Passwrd from User WHERE Passwrd = ?', [password], async (errorPass, resultsPass) => {
+    db.query('SELECT Username from User WHERE Username = ?', [username], (error, results) => {
+        db.query('SELECT Passwrd from User WHERE Passwrd = ?', [password], (errorPass, resultsPass) => {
 
             var resultUser = Object.values(JSON.parse(JSON.stringify(results)))
             var resultPass = Object.values(JSON.parse(JSON.stringify(resultsPass)))
@@ -88,19 +148,22 @@ exports.login = (req, res) => {
             // if(resultArray.length && password.length > 0) password is correct
             // if password correct, query all information from said user, and add it to the UserDashboard page.
             if(resultUser.length > 0 && resultPass.length > 0){
-                db.query(userPrinterSQL, [username, username], async (error, results) => {
-                    res.render('UserDashboard', {"data":results[0], "myHotelData":results[1], "myData":results[2]});
+                db.query(userPrinterSQL, [username, username], (error, results) => {
+                    res.render('AdminDashboard', {"data":results[0], "myHotelData":results[1], "myData":results[2]});
                     let s = username;
                     
                     if (typeof localStorage === "undefined" || localStorage === null) {
                         var LocalStorage = require('node-localstorage').LocalStorage;
                         localStorage = new LocalStorage('./scratch');
                      } else{
-                        throw error;
+                        console.log("Admin Login Error: ", error);
+                        console.log("Admin Login ErrorPass: ", errorPass);
                      }
                      
-                    let globalX = localStorage.getItem('username');
-                    console.log("Local Storage Username: ", globalX);
+                     localStorage.clear();
+                     localStorage.setItem("username", s); 
+                     let globalX = localStorage.getItem("username");
+                     console.log("Local Storage Username: ", globalX);
                     // profile page should have same username
                     
                 })
@@ -124,7 +187,7 @@ exports.refresh = (req, res) => {
 
     db.query(userPrinterSQL, [localStorage.getItem('username')],async (error, results) => {
         
-        res.render('UserDashboard', {"data":results[0], "myData":results[1]});
+        res.render('AdminDashboard', {"data":results[0], "myData":results[1]});
         
       })
 
